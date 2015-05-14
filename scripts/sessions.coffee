@@ -2,10 +2,13 @@
 #   Performs actions on the DDD sessions
 #
 # Dependencies:
-#   None
+#   "azure-storage": "0.4.4"
+#
+# Configuration:
+#   AZURE_STORAGE_CONNECTION_STRING
 #
 # Commands:
-#   hubot sessions - List all the sessions requiring approval
+#   hubot sessions - List sessions that requiring approval (max 10)
 #   hubot sessions approve <sessionIds> - Approves the sessions supplied in the comma-separated list of session ids
 #
 # Author:
@@ -22,11 +25,11 @@ listUnapprovedSessions = (msg) ->
 
   tableSvc.queryEntities('Sessions', query, null, (err, result, response) -> 
     if err
-      msg.reply "Error getting sessions"
+      msg.reply "Something's broken, I couldn't find any sessions"
       return
 
     if !result.entries or result.entries.length == 0
-      msg.reply "Yay, none to approve."
+      msg.reply "Yay, no sessions to approve"
       return
 
     for session in result.entries
@@ -41,23 +44,22 @@ approve = (msg, sessionId) ->
 
   tableSvc.mergeEntity('Sessions', session, (err, result, response) -> 
     if err
-      msg.reply "Error updating session '#{sessionId}'"
+      msg.reply "Something's wrong, I couldn't approve '#{sessionId}'"
       return
 
-    msg.reply "'#{sessionId}' has been approved"
+    msg.reply "'#{sessionId}' is now approved"
   )
 
 module.exports = (robot) ->
-#(?<![\w\d])abc(?![\w\d])
   robot.respond /sessions$/, (msg) ->
-    msg.reply "Finding sessions requiring approval (max 10)..."
+    msg.reply "Searching for unapproved sessions..."
     listUnapprovedSessions(msg)
 
   robot.respond /sessions approve (.*)/i, (msg) ->
     sessionIds = msg.match[1].split(',')
 
     if !sessionIds or sessionIds.length == 0
-      msg.replay "Please supply some sessions."
+      msg.replay "You haven't given me any sessions mate"
       return
 
     msg.reply "Approving sessions..."
