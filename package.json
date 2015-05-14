@@ -15,7 +15,6 @@
     "hubot-pugme": "~0.1.0",
     "hubot-youtube": "~0.1.2",
     "hubot-heroku-keepalive": "0.0.4",
-    "hubot-scripts": "~2.5.16",
     "hubot-slack": "~3.3.0",
     "hubot": "~2.12.0",
     "azure-storage": "0.4.4"
