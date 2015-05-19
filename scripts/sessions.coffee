@@ -33,7 +33,11 @@ listUnapprovedSessions = (msg) ->
       return
 
     for session in result.entries
-      msg.reply "Id: #{session.RowKey._} \nTitle: #{session.SessionTitle._} \nAbstract: #{session.SessionAbstract._}"
+      msg.reply "
+      *Id:* #{session.RowKey._} \n
+      *Presenter:* #{session.PresenterName._} \n
+      *Title:* #{session.SessionTitle._} \n
+      *Abstract:* #{session.SessionAbstract._}"
   )
 
 approve = (msg, sessionId) ->   
