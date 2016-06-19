@@ -8,8 +8,8 @@
 #   AZURE_STORAGE_CONNECTION_STRING
 #
 # Commands:
-#   hubot sessions - List sessions that requiring approval (max 10)
-#   hubot sessions approve <sessionIds> - Approves the sessions supplied in the comma-separated list of session ids
+#   dddmelb sessions - List sessions that requiring approval (max 10)
+#   dddmelb sessions approve <sessionIds> - Approves the sessions supplied in the comma-separated list of session ids
 #
 # Author:
 #   Neil Campbell

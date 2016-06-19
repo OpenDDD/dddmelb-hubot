@@ -17,7 +17,8 @@
     "hubot-heroku-keepalive": "1.0.0",
     "hubot-slack": "~3.3.0",
     "hubot": "~2.12.0",
-    "azure-storage": "0.4.4"
+    "azure-storage": "0.4.4",
+    "lodash": "4.13.1"
   },
   "engines": {
     "node": "0.10.x"
