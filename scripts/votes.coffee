@@ -19,25 +19,43 @@ _ = require('lodash');
 tableSvc = azure.createTableService()
 
 listVotes = (msg) -> 
-  query = new azure.TableQuery()
+  votesQuery = new azure.TableQuery()
     .where('CorrectEmail eq ?', true)
     .and('ValidOrder eq ?', true)
 
-  tableSvc.queryEntities('Votes', query, null, (err, result, response) -> 
-    if err
+  sessionsQuery = new azure.TableQuery()
+    .where('Status eq ?', 1)
+
+  result = "\n"
+
+  tableSvc.queryEntities('Votes', votesQuery, null, (votesErr, votesResult, votesResponse) -> 
+    if votesErr
       msg.reply "Something's broken, I couldn't find any votes"
       return
 
-    if !result.entries or result.entries.length == 0
+    if !votesResult.entries or votesResult.entries.length == 0
+      msg.reply "No votes have been recorded"
       return
-      
-    votesBySession = _.groupBy(result.entries, (vote) -> vote.SessionId._)
-    orderedVotesBySession = _.orderBy(votesBySession, [(votes) -> votes.length], ['desc'])
 
-    for votesForSession in orderedVotesBySession
-      msg.reply "\n
-*Title:* (#{votesForSession[0].SessionId._}) \n
-*Votes:* #{votesForSession.length}"
+    tableSvc.queryEntities('Sessions', sessionsQuery, null, (sessionsErr, sessionsResult, sessionsResponse) -> 
+      if sessionsErr
+        msg.reply "Something's broken, I couldn't find any sessions"
+        return
+
+      if !sessionsResult.entries or sessionsResult.entries.length == 0
+        msg.reply "No sessions have been found"
+        return
+      
+      votesBySession = _.groupBy(votesResult.entries, (vote) -> vote.SessionId._)
+      orderedVotesBySession = _.orderBy(votesBySession, [(votes) -> votes.length], ['desc'])
+      
+      for votesForSession in orderedVotesBySession
+        sessionId = votesForSession[0].SessionId._
+        session = _.find(sessionsResult.entries, (session) -> session.RowKey._ == sessionId)
+        result += "#{session.SessionTitle._} - #{votesForSession.length} votes\n"
+      
+      msg.reply result
+    )
   )
 
 module.exports = (robot) ->
