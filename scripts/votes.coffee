@@ -37,6 +37,18 @@ listVotes = (msg) ->
       msg.reply "No votes have been recorded"
       return
 
+    # Ensure only the latest 10 votes for an attendee are counted
+    votesByAttendee = _.groupBy(votesResult.entries, (vote) -> vote.OrderEmail._)
+
+    for attendee in Object.keys(votesByAttendee)
+      if votesByAttendee[attendee].length > 10
+        orderedVotes = _.orderBy(votesByAttendee[attendee], [(vote) -> vote.SubmittedDateUTC._], ['desc'])
+
+        for voteToRemove in orderedVotes[10...]
+          indexToRemove = votesResult.entries.indexOf(voteToRemove)
+          if indexToRemove > -1
+            votesResult.entries.splice(indexToRemove, 1)
+
     tableSvc.queryEntities('Sessions', sessionsQuery, null, (sessionsErr, sessionsResult, sessionsResponse) -> 
       if sessionsErr
         msg.reply "Something's broken, I couldn't find any sessions"
