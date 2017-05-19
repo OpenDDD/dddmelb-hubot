@@ -39,6 +39,8 @@ listUnapprovedSessions = (msg) ->
 *Presenter:* #{session.PresenterName._} \n
 *Title:* #{session.SessionTitle._} \n
 *Abstract:* #{session.SessionAbstract._}"
+
+    msg.reply "To approve all sessions run `sessions approve #{result.entries.map((s) -> s.RowKey._).join(',')}`"
   )
 
 approve = (msg, sessionId) ->
