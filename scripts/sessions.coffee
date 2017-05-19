@@ -15,15 +15,16 @@
 #   Neil Campbell
 
 azure = require('azure-storage')
+request = require('request')
 
 tableSvc = azure.createTableService()
 
-listUnapprovedSessions = (msg) -> 
+listUnapprovedSessions = (msg) ->
   query = new azure.TableQuery()
     .top(10)
     .where('Status eq ?', 0)
 
-  tableSvc.queryEntities('Sessions', query, null, (err, result, response) -> 
+  tableSvc.queryEntities('Sessions', query, null, (err, result, response) ->
     if err
       msg.reply "Something's broken, I couldn't find any sessions"
       return
@@ -40,13 +41,13 @@ listUnapprovedSessions = (msg) ->
 *Abstract:* #{session.SessionAbstract._}"
   )
 
-approve = (msg, sessionId) ->   
-  session = 
+approve = (msg, sessionId) ->
+  session =
     PartitionKey: { '$': 'Edm.String', _: 'Session' }
     RowKey: { '$': 'Edm.String', _: sessionId }
     Status: { _: 1 }
 
-  tableSvc.mergeEntity('Sessions', session, (err, result, response) -> 
+  tableSvc.mergeEntity('Sessions', session, (err, result, response) ->
     if err
       msg.reply "Something's wrong, I couldn't approve '#{sessionId}'"
       return
@@ -68,3 +69,22 @@ module.exports = (robot) ->
 
     msg.reply "Approving sessions..."
     approve(msg, sessionId.trim()) for sessionId in sessionIds
+
+    #deploy the sessions
+    options = {
+      url: 'https://app.wercker.com/api/v3/runs',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + process.env.WERCKER_KEY
+      },
+      json: {
+        'pipelineId': '5917ed805dec090100cdaf2d',
+        'branch': 'master',
+        'message': 'Refresh site data'
+      }
+    }
+
+    request.post(options, (err, res, body) ->
+        if !err and res.statusCode == 200
+          msg.reply "Deploying data updates..."
+    )
