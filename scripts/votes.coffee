@@ -61,11 +61,12 @@ listVotes = (msg) ->
       votesBySession = _.groupBy(votesResult.entries, (vote) -> vote.SessionId._)
       orderedVotesBySession = _.orderBy(votesBySession, [(votes) -> votes.length], ['desc'])
       
+      nOrder = 1
       for votesForSession in orderedVotesBySession
         sessionId = votesForSession[0].SessionId._
         session = _.find(sessionsResult.entries, (session) -> session.RowKey._ == sessionId)
-        result += "#{session.SessionTitle._} - #{votesForSession.length} votes\n"
-      
+        result += "#{nOrder}. #{session.SessionTitle._} - #{votesForSession.length} votes\n"
+        nOrder = nOrder + 1
       msg.reply result
     )
   )
