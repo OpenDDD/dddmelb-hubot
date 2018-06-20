@@ -65,7 +65,7 @@ listVotes = (msg) ->
       for votesForSession in orderedVotesBySession
         sessionId = votesForSession[0].SessionId._
         session = _.find(sessionsResult.entries, (session) -> session.RowKey._ == sessionId)
-        result += "#{nOrder}. #{session.SessionTitle._} - #{votesForSession.length} votes\n"
+        result += "#{nOrder}. #{session.SessionTitle._} [#{session.SessionDuration._}] - #{votesForSession.length} votes\n"
         nOrder = nOrder + 1
       msg.reply result
     )
