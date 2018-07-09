@@ -81,6 +81,3 @@ module.exports = (robot) ->
   robot.respond /votes$/, (msg) ->
     msg.reply "Getting votes for sessions..."
     listVotes(msg)
-  robot.respond /test$/, (msg) ->
-    msg.reply "Testing..."
-    msg.reply getSentence(0)
