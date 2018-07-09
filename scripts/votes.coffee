@@ -43,6 +43,17 @@ listVotes = (msg) ->
   result = "\n"
 
   retrieveVotes(null).then (entries) ->
+    # Ensure only the latest 10 votes for an attendee are counted
+    votesByAttendee = _.groupBy(entries, (vote) -> vote.OrderNumber._)
+
+    for attendee in Object.keys(votesByAttendee)
+      if votesByAttendee[attendee].length > 10
+        orderedVotes = _.orderBy(votesByAttendee[attendee], [(vote) -> vote.SubmittedDateUTC._], ['desc'])
+
+        for voteToRemove in orderedVotes[10...]
+          indexToRemove = entries.indexOf(voteToRemove)
+          if indexToRemove > -1
+            entries.splice(indexToRemove, 1)
 
     tableSvc.queryEntities('Sessions', sessionsQuery, null, (sessionsErr, sessionsResult, sessionsResponse) -> 
       if sessionsErr
